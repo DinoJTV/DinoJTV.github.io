@@ -275,6 +275,7 @@
   body[data-theme="pixel"] .link:hover, body[data-theme="pixel"] .link:focus-visible { color: #000; }
   body.btn-solid .link { background: var(--accent); color: #fff; border-color: transparent; }
   body.btn-outline .link { background: transparent; border: 2px solid var(--accent); }
+  button.link { width: 100%; font-family: inherit; text-align: left; cursor: pointer; }
   .link .icon { font-size: 1.5rem; width: 2rem; text-align: center; }
   .link .arrow { margin-left: auto; opacity: .6; }
 
@@ -492,7 +493,9 @@ const SETTINGS = {
   // ---------- BUTTONS ----------
   buttonStyle: "glass",       // "glass", "solid", or "outline"
   // Example:  { icon: "📺", label: "YouTube", url: "https://youtube.com/@you" },
+  // Add  secret: true  to hide where a button goes (no link preview when people hover) 😏
   links: [
+    { icon: "💎", label: "check out my new setup", url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", secret: true },
   ],
 
   // ---------- BACKGROUND & EFFECTS ----------
@@ -676,11 +679,19 @@ const SETTINGS = {
   (S.links || []).forEach((l, i) => {
     const href = safeUrl(l.url, true);
     if (!href) return;
-    const a = document.createElement("a");
+    let a;
+    if (l.secret) {
+      // a button instead of a link, so the browser can't show where it goes 😏
+      a = document.createElement("button");
+      a.type = "button";
+      a.onclick = () => window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      a = document.createElement("a");
+      a.href = href;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";   // SAFETY: the other site can't control your page
+    }
     a.className = "link";
-    a.href = href;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";   // SAFETY: the other site can't control your page
     a.style.animationDelay = (0.3 + i * 0.08) + "s";
     const icon = document.createElement("span"); icon.className = "icon"; icon.textContent = l.icon || "🔗";
     const label = document.createElement("span"); label.textContent = l.label || href;
