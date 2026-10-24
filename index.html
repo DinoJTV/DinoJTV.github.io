@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Privacy: don't tell other websites which page visitors came from (also helps pictures from some sites load) -->
+<meta name="referrer" content="no-referrer">
+
+<!-- ✏️ DISCORD PREVIEW
+     When you paste your link in Discord, it reads these lines to make the little preview box.
+     Change the words inside the quotes. -->
+<title>Dino</title>
+<meta property="og:title" content="Dino 🦖">
+<meta property="og:description" content="hello future whoever is seeing this :)">
+<meta name="theme-color" content="#009E60">
+<!-- PICTURE IN DISCORD PREVIEW: paste your picture link between the quotes below.
+     Leave it empty ("") if you don't want a picture. -->
+<meta property="og:image" content="https://i.pinimg.com/736x/94/1a/c9/941ac993da1b6350f0fe60e047e810a7.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Press+Start+2P&family=Comic+Neue:wght@400;700&family=Orbitron:wght@500;800&family=Pacifico&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  @property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  @keyframes spin { to { --spin: 360deg; } }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* Everything is measured in "rem", so the "size" setting can grow the whole page */
+  html { font-size: calc(16px * var(--size, 1)); }
+  @media (max-width: 520px) { html { font-size: calc(13.5px * var(--size, 1)); } }
+
+  /* ---------- THEME: DARK (the default) ---------- */
+  body {
+    --bg1: #07060f; --bg2: #1a1033;
+    --card: rgba(16, 12, 32, .55);
+    --text: #f4f2ff; --muted: #b9b3d9;
+    --accent: #a855f7; --accent2: #22d3ee;
+    --btn: rgba(255, 255, 255, .06);
+    --border: 1px solid rgba(255, 255, 255, .12);
+    --radius: 1.6rem;
+    --font: 'Poppins', system-ui, sans-serif;
+    --glow: 0 0 2.5rem color-mix(in srgb, var(--accent) 45%, transparent);
+    --av-r: 50%;
+
+    font-family: var(--font);
+    color: var(--text);
+    background: linear-gradient(160deg, var(--bg1), var(--bg2)) fixed;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 2.5rem 1rem;
+    overflow-x: hidden;
+  }
+
+  /* ---------- THEME: PASTEL ---------- */
+  body[data-theme="pastel"] {
+    --bg1: #ffd6e8; --bg2: #c9e4ff;
+    --card: rgba(255, 255, 255, .55);
+    --text: #4a3b5c; --muted: #7d6b8f;
+    --accent: #ff8fc7; --accent2: #8fb8ff;
+    --btn: rgba(255, 255, 255, .6);
+    --border: 1px solid rgba(255, 255, 255, .9);
+    --radius: 2rem;
+    --glow: 0 .7rem 2.5rem color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+
+  /* ---------- THEME: PIXEL ---------- */
+  body[data-theme="pixel"] {
+    --bg1: #0f0f23; --bg2: #1b2a4a;
+    --card: rgba(10, 10, 30, .88);
+    --text: #e0f8d0; --muted: #8fbf8f;
+    --accent: #39ff14; --accent2: #ffcc00;
+    --btn: rgba(57, 255, 20, .08);
+    --border: 4px solid var(--accent);
+    --radius: 0px;
+    --font: 'Press Start 2P', monospace;
+    --glow: .5rem .5rem 0 rgba(0, 0, 0, .6);
+    --av-r: 0;
+  }
+  body[data-theme="pixel"] #name { font-size: 1.5rem; line-height: 1.6; }
+  body[data-theme="pixel"] #bio { font-size: .72rem; line-height: 2.1; }
+  body[data-theme="pixel"] .link { font-size: .8rem; }
+  body[data-theme="pixel"] #status-pill,
+  body[data-theme="pixel"] #since,
+  body[data-theme="pixel"] #copy { font-size: .6rem; }
+  body[data-theme="pixel"] #player { font-size: .6rem; }
+  body[data-theme="pixel"] #enter p { font-size: .9rem; }
+  body[data-theme="pixel"] #avatar,
+  body[data-theme="pixel"] #banner-img { image-rendering: pixelated; }
+  body[data-theme="pixel"] #avatar-wrap::before { animation: none; background: var(--accent); }
+
+  /* ---------- Background ---------- */
+  #bg {
+    position: fixed; inset: -40px; z-index: -2;
+    background-size: cover; background-position: center;
+    transition: transform .4s ease-out;
+  }
+  #bg::after { /* a see-through dark layer so words are easy to read */
+    content: ""; position: absolute; inset: 0;
+    background: rgba(0, 0, 0, var(--dim, 0));
+  }
+  #bg-video { width: 100%; height: 100%; object-fit: cover; display: none; }
+  #fx { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+
+  /* ---------- The card ---------- */
+  #card-wrap { width: 100%; max-width: var(--width, 620px); opacity: 0; position: relative; }
+  body.entered #card-wrap { animation: pop .9s cubic-bezier(.2, .9, .3, 1.2) forwards; }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(2.5rem) scale(.94); }
+    to   { opacity: 1; transform: none; }
+  }
+  #card {
+    position: relative;
+    background: var(--card);
+    border: var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(var(--blur, 16px)); -webkit-backdrop-filter: blur(var(--blur, 16px));
+    box-shadow: var(--glow);
+    overflow: hidden;
+    text-align: center;
+    transition: transform .15s ease-out;
+  }
+  /* glowing line that spins around the card's edge */
+  body.glow-border #card::before {
+    content: ""; position: absolute; inset: 0; z-index: 4;
+    border-radius: inherit; padding: 2px;
+    background: conic-gradient(from var(--spin), var(--accent), var(--accent2), transparent 35%, transparent 65%, var(--accent));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    animation: spin 6s linear infinite;
+    pointer-events: none;
+  }
+  body[data-theme="pixel"].glow-border #card::before { display: none; }
+
+  /* Banner (slowly zooms like a movie camera) */
+  #banner { height: 13rem; position: relative; overflow: hidden; }
+  #banner-img {
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, var(--accent), var(--accent2));
+    background-size: cover; background-position: center;
+    animation: kenburns 18s ease-in-out infinite alternate;
+  }
+  @keyframes kenburns { from { transform: scale(1.02); } to { transform: scale(1.14) translateX(-2%); } }
+  #banner::after { /* soft fade into the card */
+    content: ""; position: absolute; inset: auto 0 0 0; height: 45%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, .35));
+  }
+
+  /* Profile picture with spinning colour ring + status dot */
+  #avatar-wrap {
+    width: 9.5rem; height: 9.5rem;
+    margin: -5rem auto 0;
+    position: relative; z-index: 3;
+    border-radius: var(--av-r);
+    transition: transform .3s;
+  }
+  #avatar-wrap:hover { transform: scale(1.06) rotate(-3deg); }
+  #avatar-wrap::before {
+    content: ""; position: absolute; inset: -6px; border-radius: inherit;
+    background: conic-gradient(from var(--spin), var(--accent), var(--accent2), var(--accent));
+    animation: spin 4s linear infinite;
+    filter: drop-shadow(0 0 .8rem var(--accent));
+  }
+  body.no-ring #avatar-wrap::before { display: none; }
+  #avatar {
+    position: absolute; inset: 0; border-radius: inherit;
+    border: 5px solid var(--bg1);
+    background: var(--accent) center / cover no-repeat;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.8rem; font-weight: 800; color: #fff;
+  }
+  #status-dot {
+    position: absolute; right: .3rem; bottom: .3rem; z-index: 2;
+    width: 1.9rem; height: 1.9rem; border-radius: 50%;
+    background: var(--status, #23a55a); border: .32rem solid var(--bg1);
+    display: none;
+  }
+  body.av-square #status-dot, body.av-rounded #status-dot { right: -.4rem; bottom: -.4rem; }
+  body.av-rounded { --av-r: 26%; }
+  body.av-square { --av-r: 0; }
+
+  /* Name */
+  #name {
+    font-size: 2.8rem; font-weight: 800; margin: 1rem 1.5rem 0; line-height: 1.2;
+    background: linear-gradient(90deg, var(--text), var(--accent2), var(--text));
+    background-size: 200% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 4s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+  body.name-glow #name, body.name-none #name {
+    background: none; color: var(--text); -webkit-text-fill-color: var(--text); animation: none;
+  }
+  body.name-glow #name { text-shadow: 0 0 .6rem var(--accent), 0 0 1.6rem var(--accent); animation: breathe 3s ease-in-out infinite; }
+  @keyframes breathe { 50% { text-shadow: 0 0 .9rem var(--accent), 0 0 2.6rem var(--accent); } }
+  body.name-rainbow #name {
+    background-image: linear-gradient(90deg, #ff4d4d, #ffb84d, #fff04d, #4dff88, #4dc3ff, #b84dff, #ff4d4d);
+    background-size: 200% auto;
+  }
+
+  /* Status pill */
+  #status-pill {
+    display: none; align-items: center; gap: .5rem;
+    margin-top: .7rem; padding: .35rem .95rem;
+    border-radius: 999px; background: var(--btn); border: var(--border);
+    font-size: .95rem; color: var(--muted);
+  }
+  #status-pill i { width: .6rem; height: .6rem; border-radius: 50%; background: var(--status, #23a55a); box-shadow: 0 0 .5rem var(--status, #23a55a); }
+
+  /* Badges with little pop-up tips */
+  #badges { display: flex; gap: .65rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+  #badges:empty { display: none; }
+  .badge {
+    position: relative;
+    font-size: 1.45rem; width: 2.7rem; height: 2.7rem;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%; background: var(--btn); border: var(--border);
+    transition: transform .2s, box-shadow .2s; cursor: default;
+  }
+  body[data-theme="pixel"] .badge { border-radius: 0; font-size: 1.1rem; }
+  .badge:hover { transform: translateY(-3px) scale(1.18); box-shadow: 0 0 1rem var(--accent); }
+  .badge[data-tip]:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + .5rem); left: 50%; transform: translateX(-50%);
+    white-space: nowrap; font-size: .75rem; font-family: var(--font);
+    padding: .35rem .6rem; border-radius: .5rem;
+    background: rgba(0, 0, 0, .85); color: #fff; pointer-events: none;
+  }
+
+  /* Bio + "written X days ago" */
+  #bio { color: var(--muted); font-size: 1.15rem; line-height: 1.6; margin: 1rem 2.5rem 0; min-height: 3.3em; }
+  #bio.typing::after { content: "|"; margin-left: 2px; color: var(--accent); animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #since { color: var(--muted); opacity: .75; font-size: .9rem; margin-top: .5rem; }
+  #since:empty { display: none; }
+
+  /* Copy-username button */
+  #copy {
+    display: none; margin: 1.1rem auto 0; padding: .55rem 1.1rem;
+    border-radius: 999px; border: var(--border); background: var(--btn);
+    color: var(--text); font: inherit; font-size: .95rem; cursor: pointer;
+    transition: background .2s, transform .2s;
+  }
+  #copy:hover, #copy:focus-visible { background: var(--accent); color: #fff; transform: scale(1.04); outline: none; }
+
+  /* ---------- Link buttons ---------- */
+  #links { display: flex; flex-direction: column; gap: .8rem; padding: 1.8rem 2.2rem; }
+  #links:empty { padding: 0 0 2rem; }
+  .link {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; gap: .9rem;
+    padding: 1.1rem 1.3rem;
+    border-radius: calc(var(--radius) / 1.6);
+    background: var(--btn); border: var(--border);
+    color: var(--text); text-decoration: none;
+    font-weight: 600; font-size: 1.1rem;
+    transition: transform .2s, background .2s, box-shadow .2s, color .2s;
+    opacity: 0;
+  }
+  .link::after { /* shiny sweep on hover */
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .25) 50%, transparent 70%);
+    transform: translateX(-100%); transition: transform .6s;
+  }
+  .link:hover::after { transform: translateX(100%); }
+  body.entered .link { animation: slideIn .5s forwards; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-1.2rem); } to { opacity: 1; transform: none; } }
+  .link:hover, .link:focus-visible {
+    transform: translateY(-2px) scale(1.02);
+    background: var(--accent); color: #fff;
+    box-shadow: 0 0 1.2rem var(--accent);
+    outline: none;
+  }
+  body[data-theme="pixel"] .link:hover, body[data-theme="pixel"] .link:focus-visible { color: #000; }
+  body.btn-solid .link { background: var(--accent); color: #fff; border-color: transparent; }
+  body.btn-outline .link { background: transparent; border: 2px solid var(--accent); }
+  .link .icon { font-size: 1.5rem; width: 2rem; text-align: center; }
+  .link .arrow { margin-left: auto; opacity: .6; }
+
+  /* ---------- Music player ---------- */
+  #player {
+    display: none; align-items: center; gap: .7rem;
+    margin: 0 2.2rem 1.8rem; padding: .8rem 1rem;
+    border-radius: calc(var(--radius) / 1.6);
+    background: var(--btn); border: var(--border);
+    font-size: .95rem;
+  }
+  #play {
+    width: 2.6rem; height: 2.6rem; flex: none;
+    border: none; border-radius: 50%;
+    background: var(--accent); color: #fff; font-size: 1rem; cursor: pointer;
+  }
+  body[data-theme="pixel"] #play { border-radius: 0; color: #000; }
+  #song { flex: 1; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bars { display: flex; gap: 3px; align-items: flex-end; height: 1.1rem; }
+  .bars i { width: 4px; height: 4px; background: var(--accent2); }
+  #player.playing .bars i { animation: bounce .8s ease-in-out infinite; }
+  #player.playing .bars i:nth-child(2) { animation-delay: .2s; }
+  #player.playing .bars i:nth-child(3) { animation-delay: .4s; }
+  @keyframes bounce { 50% { height: 1.1rem; } }
+  #vol { width: 5.5rem; accent-color: var(--accent); }
+
+  /* ---------- "Click to enter" screen ---------- */
+  #enter {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; flex-direction: column; gap: 1.2rem; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, .65);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    color: #fff; cursor: pointer;
+    transition: opacity .7s;
+  }
+  #enter-emoji { font-size: 4.5rem; animation: hop 1.1s ease-in-out infinite; }
+  #enter-emoji:empty { display: none; }
+  @keyframes hop { 50% { transform: translateY(-1rem) rotate(-6deg); } }
+  #enter p { font-size: 1.3rem; letter-spacing: .25em; text-transform: lowercase; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .4; } }
+  body.entered #enter { opacity: 0; pointer-events: none; }
+
+  /* ---------- Cursor trail + click burst ---------- */
+  .trail {
+    position: fixed; width: .55rem; height: .55rem; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 .6rem var(--accent);
+    pointer-events: none; z-index: 100;
+    animation: fade .7s forwards;
+  }
+  body[data-theme="pixel"] .trail { border-radius: 0; box-shadow: none; }
+  @keyframes fade {
+    from { transform: translate(-50%, -50%) scale(1); }
+    to   { transform: translate(-50%, -50%) scale(.2); opacity: 0; }
+  }
+  .burst { position: fixed; z-index: 120; pointer-events: none; font-size: 1.5rem; }
+  body.custom-cursor, body.custom-cursor * { cursor: var(--cur), auto !important; }
+
+  /* ---------- 🦖 Dino claw cursor ---------- */
+  #dino-cursor {
+    position: fixed; left: 0; top: 0; z-index: 200;
+    width: calc(68px * var(--dino-s, 1)); height: calc(68px * var(--dino-s, 1));
+    pointer-events: none; display: none;
+    transform-origin: 25.5% 16.7%;      /* the tip of the pointing claw */
+    will-change: transform;
+    filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .5));
+    transition: opacity .2s;
+  }
+  body.dino-on #dino-cursor { display: block; }
+  body.dino-on, body.dino-on * { cursor: none !important; }
+  #dino-cursor.gone { opacity: 0; }
+  #dino-cursor svg { width: 100%; height: 100%; overflow: visible; transform-origin: 25.5% 16.7%; transition: transform .18s; }
+  #dino-cursor .f { transition: transform .14s cubic-bezier(.3, 1.6, .5, 1); }
+  #dino-cursor.hover svg { transform: scale(1.15) rotate(-6deg); }           /* over a button: claws ready! */
+  #dino-cursor.hover { --claw: #fffbe0; filter: drop-shadow(0 0 6px var(--accent)) drop-shadow(0 3px 4px rgba(0, 0, 0, .5)); }
+  #dino-cursor.grab .f { transform: scaleX(.6) rotate(16deg); }               /* clicking: claws grab */
+  #dino-cursor.grab svg { transform: scale(.92); }
+  #dino-cursor.idle .f { animation: tap 1s ease-in-out infinite; }           /* standing still: drums fingers */
+  #dino-cursor.idle .f2 { animation-delay: .15s; }
+  #dino-cursor.idle .f3 { animation-delay: .3s; }
+  @keyframes tap { 50% { transform: scaleX(.82) rotate(10deg); } }
+
+  /* People who turn off animations in their computer settings get a calm page */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="enter" role="button" tabindex="0">
+  <div id="enter-emoji"></div>
+  <p id="enter-text">click to enter</p>
+</div>
+<div id="bg"><video id="bg-video" muted loop playsinline autoplay></video></div>
+<canvas id="fx"></canvas>
+
+<div id="card-wrap">
+  <main id="card">
+    <div id="banner"><div id="banner-img"></div></div>
+    <div id="avatar-wrap"><div id="avatar"></div><span id="status-dot"></span></div>
+    <h1 id="name"></h1>
+    <div id="status-pill"><i></i><span id="status-text"></span></div>
+    <div id="badges"></div>
+    <p id="bio"></p>
+    <p id="since"></p>
+    <button id="copy" type="button"></button>
+    <nav id="links"></nav>
+    <div id="player">
+      <button id="play" aria-label="Play or pause music">▶</button>
+      <div class="bars"><i></i><i></i><i></i></div>
+      <span id="song"></span>
+      <input id="vol" type="range" min="0" max="1" step="0.05" aria-label="Volume">
+    </div>
+  </main>
+</div>
+
+<audio id="audio" preload="none"></audio>
+
+<!-- 🦖 the dinosaur claw cursor (drawn with shapes, so it can move its fingers) -->
+<div id="dino-cursor" class="gone" aria-hidden="true">
+  <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" style="stop-color: var(--accent)"/>
+        <stop offset="1" stop-color="#0a4d2a"/>
+      </linearGradient>
+      <!-- one finger, pointing right from the palm -->
+      <g id="finger">
+        <path d="M4,-5.5 C11,-6.5 19,-5.5 25,-4 C28.5,-2.2 28.5,2.2 25,4 C19,5.5 11,6.5 4,5.5 Z"
+              fill="url(#skin)" stroke="#06331c" stroke-width="1.3" stroke-linejoin="round"/>
+        <path d="M15,-5.2 Q16.3,0 15,5.2 M21,-4.6 Q22.2,0 21,4.6" fill="none" stroke="#06331c" stroke-width=".8" opacity=".55"/>
+        <path class="claw" d="M24,-4 C31,-5 36.5,-1.4 37.5,4 C34,1.4 29.5,1.8 25,3.6 Z"
+              style="fill: var(--claw, #efe4c6)" stroke="#4a3a1c" stroke-width=".9" stroke-linejoin="round"/>
+      </g>
+    </defs>
+    <!-- arm -->
+    <path d="M44,30 C52,36 60,44 66,52 L66,68 L54,68 C48,58 40,50 31,44 Z"
+          fill="url(#skin)" stroke="#06331c" stroke-width="1.3" stroke-linejoin="round"/>
+    <!-- fingers (each can wiggle) -->
+    <g transform="translate(40 40) rotate(-95)"><g class="f f3"><use href="#finger"/></g></g>
+    <g transform="translate(40 40) rotate(-175)"><g class="f f2"><use href="#finger"/></g></g>
+    <g transform="translate(40 40) rotate(-135)"><g class="f f1"><use href="#finger"/></g></g>
+    <!-- palm + scales -->
+    <ellipse cx="41" cy="41" rx="11" ry="10.5" fill="url(#skin)" stroke="#06331c" stroke-width="1.3"/>
+    <g fill="#06331c" opacity=".35">
+      <circle cx="42" cy="37" r="1.7"/><circle cx="37" cy="43" r="1.3"/><circle cx="45" cy="44" r="1.4"/>
+      <circle cx="51" cy="47" r="1.6"/><circle cx="56" cy="53" r="1.4"/><circle cx="50" cy="55" r="1.2"/>
+    </g>
+  </svg>
+</div>
+
+<script>
+/* =====================================================================
+   ✏️  YOUR SETTINGS  —  this is the ONLY part you need to change!
+   Rules:
+   • Keep the "quotes" around words and links.
+   • Keep the commas at the end of lines.
+   • Every link must start with https://
+   • Leave something as "" (empty quotes) to turn it off.
+   ===================================================================== */
+const SETTINGS = {
+
+  // ---------- SIZE ----------
+  size: 1.15,                 // makes EVERYTHING bigger or smaller (1 = normal, 1.3 = huge)
+  cardWidth: 620,             // how wide the card is, in pixels (320 to 900)
+
+  // ---------- STYLE ----------
+  theme: "dark",              // pick one: "dark", "pastel", or "pixel"
+  accentColor: "#009E60",     // main colour, like "#ff4d6d"         ("" = theme's colour)
+  accentColor2: "#000080",    // second colour, like "#22d3ee"       ("" = theme's colour)
+  textColor: "",              // colour of the words, like "#ffffff"  ("" = theme's colour)
+  font: "",                   // "" = theme's font, or one of: "Poppins", "Press Start 2P",
+                              //   "Comic Neue", "Orbitron", "Pacifico", "Space Mono"
+
+  // ---------- CARD ----------
+  cardColor: "",              // colour of the card box, like "#000000" ("" = theme's colour)
+  cardOpacity: 0.55,          // 0 = see-through, 1 = solid (only used if cardColor is filled in)
+  cardBlur: 16,               // how blurry things behind the card look (0 = no blur, 30 = lots)
+  roundness: -1,              // corner roundness: -1 = theme default, 0 = square, 40 = very round
+  glowBorder: true,           // true = a glowing line spins around the edge of the card
+  tilt: true,                 // true = card tilts a little when you move your mouse
+  parallax: true,             // true = background moves a little when you move your mouse
+
+  // ---------- ABOUT YOU ----------
+  name: "Dino",
+  nameEffect: "glow",         // "shine", "glow", "rainbow", or "none"
+
+  // Little coloured dot on your picture, like Discord.
+  // type: "online", "idle", "dnd" (do not disturb), "offline", or "none"
+  // text: a short message next to it ("" = just shows the type)
+  status: { type: "online", text: "" },
+
+  // Emoji badges. Simple:  "🦖"   With a pop-up tip:  { icon: "🦖", tip: "dino fan" }
+  badges: ["🐶", "🦖", "🦾"],
+
+  // Your bio. One line:  bio: "hello!",
+  // Or several lines that take turns:  bio: ["hello!", "i like games", "welcome ✨"],
+  bio: [
+    "Hi my name is dino, im writing this october 24th 2026, hello future whoever is seeing this :)",
+    "aka DinoJTV / Dinoj11",
+  ],
+  typingBio: true,            // true = bio types itself out like a keyboard
+  writtenOn: "2026-10-24",    // the day you wrote your bio (year-month-day)
+  showTimeSince: true,        // true = shows "written 3 days ago" etc. for future visitors
+  animateTabTitle: true,      // true = your name types itself in the browser tab
+  discordUsername: "",        // your Discord username = shows a "copy username" button
+
+  // ---------- PICTURES ----------
+  profilePicture: "https://i.pinimg.com/736x/94/1a/c9/941ac993da1b6350f0fe60e047e810a7.jpg",
+  avatarShape: "circle",      // "circle", "rounded", or "square"
+  avatarRing: true,           // true = spinning colour ring around your picture
+  banner: "https://i.pinimg.com/736x/11/ea/79/11ea791d4c61f4de604dfce8bd1999ee.jpg",
+  showBanner: true,           // false = hide the banner completely
+
+  // ---------- BUTTONS ----------
+  buttonStyle: "glass",       // "glass", "solid", or "outline"
+  // Example:  { icon: "📺", label: "YouTube", url: "https://youtube.com/@you" },
+  links: [
+  ],
+
+  // ---------- BACKGROUND & EFFECTS ----------
+  background: {
+    image: "https://i.pinimg.com/originals/f9/96/71/f996717bb5868bdbfb9ad5fb351e75df.gif",
+    video: "",                // link to an .mp4 video (used instead of the picture if filled in)
+    darken: 0.35,             // 0 = no darkening, 0.8 = very dark (helps words stand out)
+  },
+  effect: "ferns",            // floating effect: "ferns" (jurassic plants), "stars", "snow",
+                              //   "bubbles", "hearts", "rain", "fireflies", or "none"
+  effectAmount: 1,            // 0.5 = fewer, 1 = normal, 2 = lots
+  clickEffect: "jurassic",    // what pops out when you click: "jurassic", "sparkles", "hearts", or "none"
+
+  // ---------- MUSIC ----------
+  music: {
+    link: "music.mp3",        // an .mp3 link, OR the name of a song file uploaded next to this page
+    title: "",                // song name to show, like "Lofi Beats"
+    volume: 0.4,              // 0 = silent, 1 = loudest
+  },
+
+  // ---------- MOUSE ----------
+  cursor: {
+    style: "dino",            // "dino" = moving dinosaur claw, "image" = your own picture, "normal" = regular
+    image: "",                // (for "image") link to a SMALL picture (32×32 pixels)
+    dinoSize: 1,              // how big the dino claw is (0.6 = small, 1 = normal, 1.5 = big)
+    trail: true,              // true = little glowing dots follow the mouse
+  },
+
+  // ---------- ENTER SCREEN ----------
+  clickToEnter: true,         // show "click to enter" first (it's always shown if you have music)
+  enterText: "click to enter",
+  enterEmoji: "🦖",           // bouncing emoji on the enter screen ("" = none)
+};
+</script>
+
+<script>
+/* =====================================================================
+   The machinery below makes everything work. You don't need to touch it.
+   ===================================================================== */
+(function () {
+  const S = SETTINGS;
+  const $ = (id) => document.getElementById(id);
+  const body = document.body;
+  const root = document.documentElement;
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = matchMedia("(pointer: fine)").matches;
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, Number(n) || 0));
+  const pick = (val, list, fallback) => (list.includes(val) ? val : fallback);
+
+  // SAFETY: only allow real https:// links (blocks sneaky "javascript:" links)
+  function safeUrl(u, allowMail, allowLocal) {
+    if (!u) return null;
+    // a picture/song file uploaded right next to this page, like "music.mp3"
+    if (allowLocal && /^[\w-]+(\/[\w-]+)*\.(mp3|ogg|wav|m4a|png|jpe?g|gif|webp|mp4|webm)$/i.test(u)) return u;
+    try {
+      const x = new URL(u);
+      if (x.protocol === "https:") return x.href;
+      if (allowMail && x.protocol === "mailto:") return x.href;
+    } catch (e) {}
+    console.warn("Skipped a link that isn't safe (it must start with https://):", u);
+    return null;
+  }
+  const cssUrl = (u) => 'url("' + u.replace(/["\\\n]/g, encodeURIComponent) + '")';
+  // SAFETY: only accept real colour codes like #ff00aa
+  const isColor = (c) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(c || "");
+  function hexToRgb(hex) {
+    let h = hex.slice(1);
+    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    const n = parseInt(h, 16);
+    return [n >> 16, (n >> 8) & 255, n & 255];
+  }
+
+  // ---------- Size, theme, colours, font ----------
+  const size = clamp(S.size ?? 1, 0.7, 1.6);
+  root.style.setProperty("--size", size);
+  body.dataset.theme = pick(S.theme, ["dark", "pastel", "pixel"], "dark");
+  if (isColor(S.accentColor)) body.style.setProperty("--accent", S.accentColor);
+  if (isColor(S.accentColor2)) body.style.setProperty("--accent2", S.accentColor2);
+  if (isColor(S.textColor)) body.style.setProperty("--text", S.textColor);
+  const fonts = ["Poppins", "Press Start 2P", "Comic Neue", "Orbitron", "Pacifico", "Space Mono"];
+  if (fonts.includes(S.font)) body.style.setProperty("--font", `'${S.font}', system-ui, sans-serif`);
+
+  // ---------- Card ----------
+  if (isColor(S.cardColor)) {
+    const [r, g, b] = hexToRgb(S.cardColor);
+    body.style.setProperty("--card", `rgba(${r}, ${g}, ${b}, ${clamp(S.cardOpacity ?? 0.55, 0, 1)})`);
+  }
+  body.style.setProperty("--blur", clamp(S.cardBlur ?? 16, 0, 40) + "px");
+  body.style.setProperty("--width", clamp(S.cardWidth || 620, 320, 900) * size + "px");
+  if (Number(S.roundness) >= 0) body.style.setProperty("--radius", clamp(S.roundness, 0, 60) + "px");
+  if (S.glowBorder) body.classList.add("glow-border");
+
+  // ---------- Style choices (each checked against a list of allowed words) ----------
+  body.classList.add("btn-" + pick(S.buttonStyle, ["glass", "solid", "outline"], "glass"));
+  body.classList.add("av-" + pick(S.avatarShape, ["circle", "rounded", "square"], "circle"));
+  body.classList.add("name-" + pick(S.nameEffect, ["shine", "glow", "rainbow", "none"], "shine"));
+  if (S.avatarRing === false) body.classList.add("no-ring");
+  if (S.showBanner === false) { $("banner").style.display = "none"; $("avatar-wrap").style.marginTop = "2rem"; }
+
+  // ---------- Name (textContent = shown as plain words, never run as code) ----------
+  $("name").textContent = S.name || "";
+  if (S.name) document.title = S.name;
+
+  // ---------- Status ----------
+  const statusColors = { online: "#23a55a", idle: "#f0b232", dnd: "#f23f43", offline: "#80848e" };
+  const st = S.status || {};
+  if (statusColors[st.type]) {
+    body.style.setProperty("--status", statusColors[st.type]);
+    $("status-dot").style.display = "block";
+    const words = { online: "online", idle: "idle", dnd: "do not disturb", offline: "offline" };
+    $("status-text").textContent = st.text ? String(st.text) : words[st.type];
+    $("status-pill").style.display = "inline-flex";
+  }
+
+  // ---------- Badges ----------
+  (S.badges || []).slice(0, 12).forEach((b) => {
+    const s = document.createElement("span");
+    s.className = "badge";
+    if (b && typeof b === "object") {
+      s.textContent = String(b.icon || "⭐");
+      if (b.tip) s.dataset.tip = String(b.tip);
+    } else s.textContent = String(b);
+    $("badges").appendChild(s);
+  });
+
+  // ---------- "Written X days ago" ----------
+  if (S.showTimeSince && /^\d{4}-\d{2}-\d{2}$/.test(S.writtenOn || "")) {
+    const [y, m, d] = S.writtenOn.split("-").map(Number);
+    const written = new Date(y, m - 1, d);
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Math.round((today - written) / 86400000);
+    let msg = "";
+    if (days === 0) msg = "written today";
+    else if (days === 1) msg = "written yesterday";
+    else if (days > 1 && days < 365) msg = `written ${days} days ago`;
+    else if (days >= 365) {
+      const yrs = Math.floor(days / 365.25), rest = Math.round(days - yrs * 365.25);
+      msg = `written ${yrs} year${yrs > 1 ? "s" : ""}` + (rest ? ` and ${rest} day${rest > 1 ? "s" : ""}` : "") + " ago";
+    }
+    if (msg) $("since").textContent = "⏳ " + msg;
+  }
+
+  // ---------- Copy Discord username ----------
+  if (S.discordUsername) {
+    const btn = $("copy"), label = "📋 " + String(S.discordUsername);
+    btn.textContent = label;
+    btn.style.display = "inline-block";
+    btn.onclick = () => {
+      navigator.clipboard.writeText(String(S.discordUsername))
+        .then(() => (btn.textContent = "✅ copied!"))
+        .catch(() => (btn.textContent = "couldn't copy 😅"))
+        .finally(() => setTimeout(() => (btn.textContent = label), 1500));
+    };
+  }
+
+  // ---------- Tab title that types itself ----------
+  if (S.animateTabTitle && S.name && !reduceMotion) {
+    const t = Array.from(S.name);
+    let k = 0;
+    setInterval(() => {
+      k = (k + 1) % (t.length + 4);
+      document.title = t.slice(0, Math.min(k, t.length)).join("") || "‎";
+    }, 400);
+  }
+
+  // ---------- Profile picture + banner ----------
+  const pic = safeUrl(S.profilePicture, false, true);
+  if (pic) $("avatar").style.backgroundImage = cssUrl(pic);
+  else $("avatar").textContent = (S.name || "?").trim().charAt(0).toUpperCase();
+  const ban = safeUrl(S.banner, false, true);
+  if (ban) $("banner-img").style.backgroundImage = cssUrl(ban);
+
+  // ---------- Background ----------
+  const bg = S.background || {};
+  const vid = safeUrl(bg.video, false, true), img = safeUrl(bg.image, false, true);
+  if (vid) { const v = $("bg-video"); v.src = vid; v.style.display = "block"; }
+  else if (img) $("bg").style.backgroundImage = cssUrl(img);
+  $("bg").style.setProperty("--dim", vid || img ? clamp(bg.darken ?? 0.35, 0, 0.9) : 0);
+
+  // ---------- Link buttons ----------
+  (S.links || []).forEach((l, i) => {
+    const href = safeUrl(l.url, true);
+    if (!href) return;
+    const a = document.createElement("a");
+    a.className = "link";
+    a.href = href;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";   // SAFETY: the other site can't control your page
+    a.style.animationDelay = (0.3 + i * 0.08) + "s";
+    const icon = document.createElement("span"); icon.className = "icon"; icon.textContent = l.icon || "🔗";
+    const label = document.createElement("span"); label.textContent = l.label || href;
+    const arrow = document.createElement("span"); arrow.className = "arrow"; arrow.textContent = "↗";
+    a.append(icon, label, arrow);
+    $("links").appendChild(a);
+  });
+
+  // ---------- Typing bio ----------
+  function showBio() {
+    const el = $("bio");
+    const lines = (Array.isArray(S.bio) ? S.bio : [S.bio || ""]).map(String);
+    if (!S.typingBio || reduceMotion) {
+      let n = 0;
+      el.textContent = lines[0];
+      if (lines.length > 1) setInterval(() => (el.textContent = lines[++n % lines.length]), 4000);
+      return;
+    }
+    el.classList.add("typing");
+    let line = 0, i = 0, deleting = false;
+    (function step() {
+      const chars = Array.from(lines[line]); // keeps emojis in one piece
+      i += deleting ? -1 : 1;
+      el.textContent = chars.slice(0, i).join("");
+      if (!deleting && i >= chars.length) {
+        if (lines.length === 1) return;
+        deleting = true;
+        return setTimeout(step, 2600);       // wait so people can read it
+      }
+      if (deleting && i <= 0) { deleting = false; line = (line + 1) % lines.length; }
+      setTimeout(step, deleting ? 22 : 50);
+    })();
+  }
+
+  // ---------- Music ----------
+  const audio = $("audio");
+  const song = safeUrl(S.music && S.music.link, false, true);
+  if (song) {
+    audio.src = song;
+    audio.loop = true;
+    audio.volume = clamp(S.music.volume ?? 0.4, 0, 1);
+    $("vol").value = audio.volume;
+    $("song").textContent = S.music.title || "now playing";
+    $("player").style.display = "flex";
+    $("play").onclick = () => (audio.paused ? audio.play().catch(() => {}) : audio.pause());
+    $("vol").oninput = (e) => (audio.volume = e.target.value);
+    audio.onplay = () => { $("player").classList.add("playing"); $("play").textContent = "❚❚"; };
+    audio.onpause = () => { $("player").classList.remove("playing"); $("play").textContent = "▶"; };
+  }
+
+  // ---------- "Click to enter" (browsers only let music play after you click) ----------
+  function enter() {
+    if (body.classList.contains("entered")) return;
+    body.classList.add("entered");
+    if (song) audio.play().catch(() => {});
+    showBio();
+  }
+  if (song || S.clickToEnter) {
+    $("enter-text").textContent = S.enterText || "click to enter";
+    $("enter-emoji").textContent = S.enterEmoji || "";
+    $("enter").addEventListener("click", enter);
+    $("enter").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") enter(); });
+    $("enter").focus();
+  } else {
+    $("enter").remove();
+    enter();
+  }
+
+  // ---------- Custom cursor + trail ----------
+  const cur = S.cursor || {};
+  const curImg = safeUrl(cur.image, false, true);
+  const curStyle = pick(cur.style, ["dino", "image", "normal"], curImg ? "image" : "normal");
+  if (curStyle === "image" && curImg) { body.style.setProperty("--cur", cssUrl(curImg)); body.classList.add("custom-cursor"); }
+
+  // 🦖 Dino claw: follows the mouse, leans when you move, grabs when you click,
+  //    gets excited over buttons, and drums its fingers when you stand still
+  if (curStyle === "dino" && finePointer) {
+    const dc = $("dino-cursor");
+    body.style.setProperty("--dino-s", clamp(cur.dinoSize ?? 1, 0.5, 2));
+    body.classList.add("dino-on");
+    let mx = -200, my = -200, lastX = -200, lean = 0, idleTimer;
+    addEventListener("mousemove", (e) => {
+      mx = e.clientX; my = e.clientY;
+      dc.classList.remove("gone", "idle");
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => dc.classList.add("idle"), 1500);
+    });
+    addEventListener("mousedown", () => dc.classList.add("grab"));
+    addEventListener("mouseup", () => dc.classList.remove("grab"));
+    root.addEventListener("mouseleave", () => dc.classList.add("gone"));
+    addEventListener("mouseover", (e) => {
+      dc.classList.toggle("hover", !!(e.target.closest && e.target.closest("a, button, input, [role=button]")));
+    });
+    (function follow() {
+      const w = dc.offsetWidth;
+      if (!reduceMotion) lean += (clamp((mx - lastX) * 1.2, -22, 22) - lean) * 0.18;
+      lastX = mx;
+      dc.style.transform = `translate(${mx - w * 0.255}px, ${my - w * 0.167}px) rotate(${lean}deg)`;
+      requestAnimationFrame(follow);
+    })();
+  }
+  if (cur.trail && finePointer && !reduceMotion) {
+    let last = 0;
+    addEventListener("mousemove", (e) => {
+      const now = performance.now();
+      if (now - last < 30) return;
+      last = now;
+      const d = document.createElement("div");
+      d.className = "trail";
+      d.style.left = e.clientX + "px";
+      d.style.top = e.clientY + "px";
+      body.appendChild(d);
+      setTimeout(() => d.remove(), 700);
+    });
+  }
+
+  // ---------- Click burst ----------
+  const bursts = { jurassic: ["🍃", "🌿", "🦖", "🦕"], sparkles: ["✨", "⭐", "💫"], hearts: ["💖", "💕", "💗"] };
+  const burstSet = bursts[S.clickEffect];
+  if (burstSet && !reduceMotion) {
+    addEventListener("pointerdown", (e) => {
+      if (!body.classList.contains("entered")) return;
+      for (let i = 0; i < 8; i++) {
+        const s = document.createElement("span");
+        s.className = "burst";
+        s.textContent = burstSet[Math.floor(Math.random() * burstSet.length)];
+        s.style.left = e.clientX + "px";
+        s.style.top = e.clientY + "px";
+        body.appendChild(s);
+        const ang = (i / 8) * Math.PI * 2 + Math.random() * 0.5;
+        const dist = 50 + Math.random() * 60;
+        const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist - 30;
+        s.animate([
+          { transform: "translate(-50%, -50%) scale(.4)", opacity: 1 },
+          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1) rotate(${Math.random() * 120 - 60}deg)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy + 40}px)) scale(.6)`, opacity: 0 },
+        ], { duration: 900, easing: "cubic-bezier(.2, .8, .3, 1)" }).onfinish = () => s.remove();
+      }
+    });
+  }
+
+  // ---------- Card tilt + background parallax ----------
+  if ((S.tilt || S.parallax) && finePointer && !reduceMotion) {
+    const card = $("card"), bgEl = $("bg");
+    addEventListener("mousemove", (e) => {
+      const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+      if (S.tilt) card.style.transform = `perspective(1100px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+      if (S.parallax) bgEl.style.transform = `translate(${x * -25}px, ${y * -25}px) scale(1.03)`;
+    });
+  }
+
+  // ---------- Floating effects ----------
+  const effect = S.effect || "stars";
+  if (effect === "none" || reduceMotion) return;
+
+  const cv = $("fx"), ctx = cv.getContext("2d");
+  const pixel = body.dataset.theme === "pixel";
+  const css = getComputedStyle(body);
+  const accent = css.getPropertyValue("--accent").trim();
+  const amount = clamp(S.effectAmount ?? 1, 0.1, 3);
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const color = effect === "snow" ? "#ffffff"
+    : effect === "rain" ? "#9ecbff"
+    : effect === "fireflies" ? "#ffe066"
+    : css.getPropertyValue(effect === "stars" ? "--accent2" : "--accent").trim();
+  let W, H, parts = [], time = 0;
+
+  // ---- simple effects (stars, snow, bubbles, hearts, rain, fireflies) ----
+  function make(fromEdge) {
+    const p = { x: rand(0, W), y: rand(0, H), t: rand(0, 6.28) };
+    if (effect === "stars")     { p.r = rand(0.6, 2);  p.vx = rand(-.08, .08); p.vy = rand(-.08, .08); }
+    if (effect === "snow")      { p.r = rand(1, 3);    p.vx = 0; p.vy = rand(.3, 1.2); if (fromEdge) p.y = -5; }
+    if (effect === "bubbles")   { p.r = rand(3, 10);   p.vx = 0; p.vy = -rand(.2, .8); if (fromEdge) p.y = H + 10; }
+    if (effect === "hearts")    { p.r = rand(8, 16);   p.vx = 0; p.vy = -rand(.3, .9); if (fromEdge) p.y = H + 10; }
+    if (effect === "rain")      { p.r = rand(8, 18);   p.vx = -1; p.vy = rand(7, 12);  if (fromEdge) p.y = -20; }
+    if (effect === "fireflies") { p.r = rand(1.5, 3);  p.vx = rand(-.3, .3); p.vy = rand(-.3, .3); }
+    return p;
+  }
+  function drawSimple() {
+    const sway = { snow: 0.3, bubbles: 0.2, hearts: 0.4, fireflies: 0.4 }[effect] || 0;
+    for (const p of parts) {
+      p.t += 0.02;
+      p.x += p.vx + Math.sin(p.t) * sway;
+      p.y += p.vy + (effect === "fireflies" ? Math.cos(p.t * 0.7) * 0.3 : 0);
+      if (p.y > H + 25 || p.y < -25 || p.x < -25 || p.x > W + 25) Object.assign(p, make(true));
+      const twinkle = effect === "stars" || effect === "fireflies";
+      ctx.globalAlpha = twinkle ? 0.3 + 0.7 * Math.abs(Math.sin(p.t)) : 0.7;
+      ctx.fillStyle = ctx.strokeStyle = color;
+      ctx.shadowBlur = effect === "fireflies" && !pixel ? 12 : 0;
+      ctx.shadowColor = color;
+      if (effect === "hearts") {
+        ctx.font = `${p.r * 1.6}px sans-serif`;
+        ctx.fillText(pixel ? "■" : "♥", p.x, p.y);
+      } else if (effect === "rain") {
+        ctx.lineWidth = pixel ? 3 : 1.2;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + p.vx * 2, p.y + p.r); ctx.stroke();
+      } else if (pixel) {
+        const s = Math.max(2, Math.round(p.r * 1.5));
+        effect === "bubbles" ? ctx.strokeRect(p.x, p.y, s * 2, s * 2) : ctx.fillRect(p.x, p.y, s, s);
+      } else {
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        effect === "bubbles" ? (ctx.lineWidth = 1.5, ctx.stroke()) : ctx.fill();
+      }
+    }
+  }
+
+  // ---- JURASSIC FERNS 🌿: layered swaying fronds, hanging vines, drifting leaves, glowing spores, mist ----
+  const darkGreens = ["#0b4d2c", "#0f5c34", "#145a32", "#0d3f26"];
+  const brightGreens = [accent, "#1fa463", "#2fbf71", "#3a8f3a", "#0b6b3a"];
+  const any = (list) => list[Math.floor(Math.random() * list.length)];
+  let fronds = [], leaves = [], spores = [];
+
+  function frond(x, y, ang, len, curl, alpha, colorList, front) {
+    return { x, y, ang, len, curl, alpha, front, ph: rand(0, 6.28), color: any(colorList) };
+  }
+  function buildFerns() {
+    fronds = [];
+    // back layer: lots of darker fronds along the bottom
+    const n = Math.max(6, Math.round((W / 110) * amount));
+    for (let i = 0; i < n; i++) {
+      const x = (i + rand(-0.35, 0.35)) * (W / (n - 1));
+      const lean = (x - W / 2) / W;
+      fronds.push(frond(x, H + 10, -Math.PI / 2 + lean * 1.1 + rand(-0.2, 0.2),
+        rand(H * 0.22, H * 0.42), (lean < 0 ? -1 : 1) * rand(0.03, 0.06), 0.45, darkGreens, false));
+    }
+    // vines hanging from the top corners
+    for (const side of [-1, 1]) {
+      const baseX = side < 0 ? 0 : W;
+      for (let k = 0; k < 2; k++) {
+        fronds.push(frond(baseX + -side * rand(10, 90), -10,
+          Math.PI / 2 + side * rand(0.35, 0.75), rand(H * 0.2, H * 0.32),
+          side * rand(0.02, 0.04), 0.5, darkGreens.concat(brightGreens), false));
+      }
+    }
+    // front layer: big bright fronds arching in from the bottom corners
+    for (const side of [-1, 1]) {
+      const baseX = side < 0 ? -20 : W + 20;
+      for (let k = 0; k < 2; k++) {
+        fronds.push(frond(baseX + -side * rand(0, 60), H + 15,
+          -Math.PI / 2 - side * rand(0.25, 0.6), rand(H * 0.38, H * 0.58),
+          -side * rand(0.035, 0.06), 0.85, brightGreens, true));
+      }
+    }
+    leaves = Array.from({ length: Math.round(16 * amount) }, () => makeLeaf(false));
+    spores = Array.from({ length: Math.round(30 * amount) }, () => makeSpore(false));
+  }
+  function makeLeaf(fromTop) {
+    return { x: rand(0, W), y: fromTop ? -15 : rand(0, H), r: rand(5, 10), vx: rand(-.3, .3), vy: rand(.3, .8),
+             rot: rand(0, 6.28), vr: rand(-.02, .02), t: rand(0, 6.28), c: any(brightGreens) };
+  }
+  function makeSpore(fromBottom) {
+    return { x: rand(0, W), y: fromBottom ? H + 5 : rand(0, H), r: rand(1, 2.4), vy: -rand(.15, .5), t: rand(0, 6.28) };
+  }
+  function leafShape(x, y, ang, L) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(ang);
+    if (pixel) ctx.fillRect(0, -2, L, 4);
+    else { ctx.beginPath(); ctx.ellipse(L / 2, 0, L / 2, L / 7 + 1, 0, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  }
+  function drawFrond(f) {
+    let x = f.x, y = f.y;
+    let a = f.ang + Math.sin(time * 0.8 + f.ph) * 0.06;
+    const K = f.front ? 20 : 16, seg = f.len / K;
+    ctx.globalAlpha = f.alpha;
+    ctx.fillStyle = ctx.strokeStyle = f.color;
+    for (let i = 0; i < K; i++) {
+      const nx = x + Math.cos(a) * seg, ny = y + Math.sin(a) * seg;
+      ctx.lineWidth = pixel ? 4 : (f.front ? 4.5 : 3) * (1 - i / K) + 0.8;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
+      const L = seg * 2.7 * (1 - i / K) + 2;
+      const flutter = Math.sin(time * 1.3 + f.ph + i * 0.3) * 0.1;
+      leafShape(nx, ny, a - 1.1 - flutter, L);
+      leafShape(nx, ny, a + 1.1 + flutter, L);
+      x = nx; y = ny;
+      a += f.curl * (1 + i * 0.08) + Math.sin(time * 0.8 + f.ph + i * 0.2) * 0.006;
+    }
+  }
+  function drawFerns() {
+    ctx.shadowBlur = 0;
+    // misty green glow along the bottom
+    const [r, g, b] = isColor(accent) ? hexToRgb(accent) : [0, 158, 96];
+    const mist = ctx.createLinearGradient(0, H * 0.55, 0, H);
+    mist.addColorStop(0, `rgba(${r},${g},${b},0)`);
+    mist.addColorStop(1, `rgba(${r},${g},${b},${0.18 + Math.sin(time * 0.5) * 0.04})`);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = mist;
+    ctx.fillRect(0, H * 0.55, W, H * 0.45);
+
+    for (const f of fronds) if (!f.front) drawFrond(f);
+
+    // drifting leaves
+    for (const p of leaves) {
+      p.t += 0.02; p.rot += p.vr;
+      p.x += p.vx + Math.sin(p.t) * 0.5; p.y += p.vy;
+      if (p.y > H + 20 || p.x < -20 || p.x > W + 20) Object.assign(p, makeLeaf(true));
+      ctx.globalAlpha = 0.75; ctx.fillStyle = p.c;
+      leafShape(p.x, p.y, p.rot, p.r * 2);
+    }
+    // glowing spores floating up
+    ctx.fillStyle = "#c8ffd9";
+    ctx.shadowColor = "#7dffb0";
+    ctx.shadowBlur = pixel ? 0 : 10;
+    for (const s of spores) {
+      s.t += 0.02;
+      s.x += Math.sin(s.t) * 0.3; s.y += s.vy;
+      if (s.y < -10) Object.assign(s, makeSpore(true));
+      ctx.globalAlpha = 0.25 + 0.6 * Math.abs(Math.sin(s.t * 1.3));
+      if (pixel) ctx.fillRect(s.x, s.y, 3, 3);
+      else { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill(); }
+    }
+    ctx.shadowBlur = 0;
+
+    for (const f of fronds) if (f.front) drawFrond(f);
+  }
+
+  function resize() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + "px"; cv.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (effect === "ferns") buildFerns();
+    else {
+      const count = Math.min(300, Math.floor((W * H) / 12000 * amount));
+      parts = Array.from({ length: count }, () => make(false));
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    time += 0.016;
+    effect === "ferns" ? drawFerns() : drawSimple();
+    requestAnimationFrame(draw);
+  }
+  addEventListener("resize", resize);
+  resize();
+  draw();
+})();
+</script>
+</body>
+</html>
